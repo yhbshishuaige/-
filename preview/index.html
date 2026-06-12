@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>BOOTFACE Preview</title>
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+  <main class="workspace">
+    <section class="watch-shell" aria-label="Xiaomi Smart Band 8 Pro preview">
+      <canvas id="watchface" width="336" height="480"></canvas>
+    </section>
+
+    <section class="panel" aria-label="Preview controls">
+      <p class="eyebrow">Xiaomi Smart Band 8 Pro · 336 x 480</p>
+      <h1>BOOTFACE</h1>
+      <p class="summary">A minimal terminal-style watch face with a pixel boot animation.</p>
+
+      <div class="controls">
+        <button id="restart" type="button">Restart</button>
+        <button id="toggle" type="button">Pause</button>
+        <button id="download" type="button">Download current PNG</button>
+      </div>
+
+      <dl class="specs">
+        <div>
+          <dt>Boot text</dt>
+          <dd>Hello world!</dd>
+        </div>
+        <div>
+          <dt>Theme</dt>
+          <dd>AMOLED black + terminal green</dd>
+        </div>
+        <div>
+          <dt>Animation</dt>
+          <dd>Centered pixel assembly, then watch face reveal</dd>
+        </div>
+      </dl>
+    </section>
+  </main>
+
+  <script src="./watchface.js"></script>
+</body>
+</html>

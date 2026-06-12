@@ -1,0 +1,14 @@
+<?xml version='1.0' encoding='utf-8'?>
+<FaceProject DeviceType="11" Id="BOOTFACE">
+	<Screen Title="BOOTFACE" Bitmap="0000.png">
+		<Widget Shape="30" Name="Background" X="0" Y="0" Width="336" Height="480" Alpha="255" Visible_Src="0" Bitmap="0000.png" />
+		<Widget Shape="32" Name="Hours" X="49" Y="116" Width="112" Height="88" Alpha="255" Digits="2" Alignment="1" Spacing="4" Blanking="0" Visible_Src="0" Value_Src="811" BitmapList="0001.png|0002.png|0003.png|0004.png|0005.png|0006.png|0007.png|0008.png|0009.png|0010.png|0024.png" />
+		<Widget Shape="30" Name="Colon" X="151" Y="116" Width="64" Height="88" Alpha="255" Visible_Src="0" Bitmap="0011.png" />
+		<Widget Shape="32" Name="Minutes" X="181" Y="116" Width="112" Height="88" Alpha="255" Digits="2" Alignment="1" Spacing="4" Blanking="0" Visible_Src="0" Value_Src="1011" BitmapList="0001.png|0002.png|0003.png|0004.png|0005.png|0006.png|0007.png|0008.png|0009.png|0010.png|0024.png" />
+		<Widget Shape="32" Name="Month" X="139" Y="202" Width="36" Height="25" Alpha="255" Digits="2" Alignment="1" Spacing="1" Blanking="0" Visible_Src="0" Value_Src="1012" BitmapList="0012.png|0013.png|0014.png|0015.png|0016.png|0017.png|0018.png|0019.png|0020.png|0021.png|0024.png" />
+		<Widget Shape="30" Name="DateDot" X="170" Y="202" Width="19" Height="25" Alpha="255" Visible_Src="0" Bitmap="0022.png" />
+		<Widget Shape="32" Name="Day" X="188" Y="202" Width="36" Height="25" Alpha="255" Digits="2" Alignment="1" Spacing="1" Blanking="0" Visible_Src="0" Value_Src="1812" BitmapList="0012.png|0013.png|0014.png|0015.png|0016.png|0017.png|0018.png|0019.png|0020.png|0021.png|0024.png" />
+		<Widget Shape="32" Name="BatteryPercent" X="261" Y="372" Width="36" Height="25" Alpha="255" Digits="2" Alignment="2" Spacing="1" Blanking="0" Visible_Src="0" Value_Src="2031" BitmapList="0012.png|0013.png|0014.png|0015.png|0016.png|0017.png|0018.png|0019.png|0020.png|0021.png|0024.png" />
+		<Widget Shape="30" Name="PercentSign" X="301" Y="372" Width="19" Height="25" Alpha="255" Visible_Src="0" Bitmap="0023.png" />
+	</Screen>
+</FaceProject>

@@ -1,6 +1,6 @@
 # BOOTFACE
 
-这是我理想中的小米手环表盘的样子[Demo](https://yhbshishuaige.github.io/-/)
+这是我理想中的小米手环表盘的样子[Demo](https://yhbshishuaige.github.io/WatchFace/)
 
 - 连续点击三下可以切换成root风格，再点击三下可以返回
 

@@ -5,14 +5,15 @@ import xml.etree.ElementTree as ET
 WIDTH = 336
 HEIGHT = 480
 ROOT = Path(__file__).resolve().parents[1]
-OUT = ROOT / "images" / "micreate"
-PROJECT = ROOT / "BOOTFACE_draft.fprj"
+PROJECT_DIR = ROOT / "micreate_project"
+OUT = PROJECT_DIR / "images"
+PROJECT = PROJECT_DIR / "BOOTFACE.fprj"
 
 GREEN = (66, 245, 141, 255)
 DIM_GREEN = (19, 115, 62, 255)
 TEXT_GREEN = (223, 255, 233, 255)
 MUTED_GREEN = (103, 155, 120, 255)
-SCAN_GREEN = (66, 245, 141, 14)
+SCAN_GREEN = (3, 14, 8, 255)
 BLACK = (0, 0, 0, 255)
 
 GLYPHS = {

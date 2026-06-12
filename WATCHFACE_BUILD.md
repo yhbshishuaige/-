@@ -4,8 +4,8 @@
 
 ## 已生成内容
 
-- `BOOTFACE_draft.fprj`：Mi Create / EasyFace 风格的草稿项目。
-- `images/micreate/`：草稿项目使用的平铺 PNG 资源。
+- `micreate_project/BOOTFACE.fprj`：Mi Create / EasyFace 风格的草稿项目。
+- `micreate_project/images/`：草稿项目使用的平铺 PNG 资源。
 - `images/boot/`：启动动画帧，`boot_000.png` 到 `boot_036.png`。
 - `images/watchface/`：完整素材包，包含普通模式、root 模式、数字、图标、标签和预览图。
 
@@ -13,8 +13,8 @@
 
 1. 打开 Mi Create。
 2. 选择小米手环 8 Pro / 336 x 480 设备。
-3. 打开 `BOOTFACE_draft.fprj`。
-4. 如果图片资源没有自动加载，把 `images/micreate/` 中的 PNG 放到 Mi Create 项目的图片资源目录，或在 Mi Create 中重新绑定。
+3. 打开 `micreate_project/BOOTFACE.fprj`。
+4. 如果图片资源没有自动加载，确认 `micreate_project/images/` 与 `BOOTFACE.fprj` 在同一目录层级下，或在 Mi Create 中重新绑定图片。
 5. 检查以下动态元素：
    - Hours：小时
    - Minutes：分钟
@@ -35,7 +35,7 @@
 
 ## 资源说明
 
-`images/micreate/` 是为了尽量适配 Mi Create 的平铺资源：
+`micreate_project/images/` 是为了尽量适配 Mi Create 的平铺资源：
 
 - `0000.png`：普通模式背景，不含时间、日期、电量百分比。
 - `0001.png` 到 `0010.png`：大号时间数字 0-9。

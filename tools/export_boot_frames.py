@@ -13,7 +13,7 @@ OUT_DIR = ROOT / "images" / "boot"
 
 GREEN = (66, 245, 141, 255)
 DIM_GREEN = (19, 115, 62, 255)
-SCAN = (66, 245, 141, 14)
+SCAN = (3, 14, 8, 255)
 BLACK = (0, 0, 0, 255)
 
 GLYPHS = {

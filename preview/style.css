@@ -50,7 +50,9 @@ body {
   display: block;
   border-radius: 28px;
   background: #000;
+  cursor: pointer;
   image-rendering: pixelated;
+  touch-action: manipulation;
 }
 
 .panel {

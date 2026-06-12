@@ -4,19 +4,36 @@ const BOOT_TEXT = "Hello world!";
 const BOOT_DURATION = 3000;
 const REVEAL_DURATION = 850;
 
-const palette = {
-  black: "#000000",
-  green: "#42f58d",
-  dimGreen: "#13733e",
-  ghost: "rgba(66, 245, 141, 0.16)",
-  text: "#dfffe9",
-  muted: "#679b78",
-  scan: "rgba(66, 245, 141, 0.055)"
+const palettes = {
+  user: {
+    black: "#000000",
+    green: "#42f58d",
+    dimGreen: "#13733e",
+    ghost: "rgba(66, 245, 141, 0.16)",
+    text: "#dfffe9",
+    muted: "#679b78",
+    scan: "rgba(66, 245, 141, 0.055)",
+    glow: "rgba(66, 245, 141, 0.38)"
+  },
+  root: {
+    black: "#020000",
+    green: "#ff4655",
+    dimGreen: "#7b1822",
+    ghost: "rgba(255, 70, 85, 0.16)",
+    text: "#ffe4e7",
+    muted: "#b66f78",
+    scan: "rgba(255, 70, 85, 0.05)",
+    glow: "rgba(255, 70, 85, 0.42)"
+  }
 };
+
+let palette = palettes.user;
 
 const glyphs = {
   " ": ["00000", "00000", "00000", "00000", "00000", "00000", "00000"],
   "!": ["00100", "00100", "00100", "00100", "00100", "00000", "00100"],
+  "#": ["01010", "01010", "11111", "01010", "11111", "01010", "01010"],
+  "$": ["00100", "01111", "10100", "01110", "00101", "11110", "00100"],
   ".": ["00000", "00000", "00000", "00000", "00000", "01100", "01100"],
   ":": ["00000", "01100", "01100", "00000", "01100", "01100", "00000"],
   ">": ["10000", "01000", "00100", "00010", "00100", "01000", "10000"],
@@ -63,6 +80,7 @@ const glyphs = {
   r: ["00000", "00000", "10110", "11001", "10000", "10000", "10000"],
   s: ["00000", "00000", "01111", "10000", "01110", "00001", "11110"],
   t: ["01000", "01000", "11110", "01000", "01000", "01001", "00110"],
+  u: ["00000", "00000", "10001", "10001", "10001", "10011", "01101"],
   w: ["00000", "00000", "10001", "10001", "10101", "10101", "01010"]
 };
 
@@ -71,11 +89,17 @@ const ctx = canvas.getContext("2d");
 const restartButton = document.getElementById("restart");
 const toggleButton = document.getElementById("toggle");
 const downloadButton = document.getElementById("download");
+const watchShell = document.querySelector(".watch-shell");
 
 let startedAt = performance.now();
 let paused = false;
 let pausedAt = 0;
 let animationFrame = 0;
+let rootMode = false;
+let activeCommand = null;
+let tapTimes = [];
+let lastModeChangeAt = 0;
+let lastTapEventAt = -Infinity;
 
 function easeOutCubic(t) {
   return 1 - Math.pow(1 - t, 3);
@@ -238,7 +262,120 @@ function drawBattery(x, y, value, alpha) {
   ctx.restore();
 }
 
+function currentElapsed() {
+  return performance.now() - startedAt;
+}
+
+function setRootMode(enabled, elapsed) {
+  rootMode = enabled;
+  palette = enabled ? palettes.root : palettes.user;
+  lastModeChangeAt = elapsed;
+  document.documentElement.dataset.bootfaceMode = enabled ? "root" : "user";
+}
+
+function getTypedCommand(command, age) {
+  const count = clamp(Math.floor(age / 170), 0, command.length);
+  return command.slice(0, count);
+}
+
+function updateCommandState(elapsed) {
+  if (!activeCommand) {
+    return;
+  }
+
+  const age = elapsed - activeCommand.startedAt;
+  if (activeCommand.kind === "su" && age > 980) {
+    setRootMode(true, elapsed);
+    activeCommand = { kind: "notice", text: "uid=0(root)", startedAt: elapsed, duration: 1150 };
+    return;
+  }
+
+  if (activeCommand?.kind === "exit" && age > 1180) {
+    setRootMode(false, elapsed);
+    activeCommand = { kind: "notice", text: "session closed", startedAt: elapsed, duration: 1050 };
+    return;
+  }
+
+  if (activeCommand?.kind === "notice" && elapsed - activeCommand.startedAt > activeCommand.duration) {
+    activeCommand = null;
+    document.documentElement.dataset.bootfaceCommand = "";
+  }
+}
+
+function drawTerminalPrompt(elapsed, alpha) {
+  const baselineY = 461;
+  const promptX = 34;
+  const bodyX = 54;
+  let prompt = rootMode ? "#" : "$";
+  let command = "";
+  let notice = "";
+
+  if (activeCommand?.kind === "su") {
+    prompt = "$";
+    command = getTypedCommand("su", elapsed - activeCommand.startedAt);
+  } else if (activeCommand?.kind === "exit") {
+    prompt = "#";
+    command = getTypedCommand("exit", elapsed - activeCommand.startedAt);
+  } else if (activeCommand?.kind === "notice") {
+    notice = activeCommand.text;
+  }
+
+  ctx.save();
+  ctx.globalAlpha = alpha;
+  ctx.font = "16px Consolas, Cascadia Mono, monospace";
+  ctx.textBaseline = "alphabetic";
+  ctx.textAlign = "left";
+  ctx.fillStyle = palette.green;
+  ctx.shadowColor = palette.green;
+  ctx.shadowBlur = 7;
+  ctx.fillText(prompt, promptX, baselineY);
+  ctx.shadowBlur = 0;
+
+  ctx.font = "14px Consolas, Cascadia Mono, monospace";
+  ctx.fillStyle = notice ? palette.muted : palette.text;
+  const body = notice || command;
+  ctx.fillText(body, bodyX, baselineY);
+
+  const cursorOn = Math.sin(elapsed / 210) > 0;
+  if (cursorOn) {
+    const cursorHeight = 15;
+    const cursorX = bodyX + ctx.measureText(body).width + 5;
+    const cursorY = baselineY - cursorHeight + 1;
+    ctx.fillStyle = palette.green;
+    ctx.shadowColor = palette.green;
+    ctx.shadowBlur = 8;
+    ctx.fillRect(Math.round(cursorX), cursorY, 9, cursorHeight);
+  }
+  ctx.restore();
+}
+
+function handleTripleTap() {
+  const eventNow = performance.now();
+  if (eventNow - lastTapEventAt < 70) {
+    return;
+  }
+  lastTapEventAt = eventNow;
+
+  const elapsed = currentElapsed();
+  if (elapsed < BOOT_DURATION + REVEAL_DURATION || activeCommand) {
+    return;
+  }
+
+  tapTimes = tapTimes.filter((time) => elapsed - time < 1500);
+  tapTimes.push(elapsed);
+
+  if (tapTimes.length >= 3) {
+    tapTimes = [];
+    activeCommand = {
+      kind: rootMode ? "exit" : "su",
+      startedAt: elapsed
+    };
+    document.documentElement.dataset.bootfaceCommand = activeCommand.kind;
+  }
+}
+
 function drawMain(elapsed, revealProgress = 1) {
+  updateCommandState(elapsed);
   const reveal = easeInOutCubic(clamp(revealProgress, 0, 1));
   const now = new Date();
   const hours = String(now.getHours()).padStart(2, "0");
@@ -265,13 +402,16 @@ function drawMain(elapsed, revealProgress = 1) {
 
   ctx.save();
   ctx.globalAlpha = reveal;
-  drawPixelText("BOOTFACE", 34, 42, { size: 3, color: palette.dimGreen, shadowBlur: 5 });
+  const modeAge = elapsed - lastModeChangeAt;
+  const modePulse = modeAge < 700 ? 1 - modeAge / 700 : 0;
+  const header = rootMode ? "ROOTFACE" : "BOOTFACE";
+  drawPixelText(header, 34, 42, { size: 3, color: palette.dimGreen, shadowBlur: 5 });
 
   ctx.font = "72px Consolas, Cascadia Mono, monospace";
   ctx.textBaseline = "top";
   ctx.textAlign = "center";
   ctx.fillStyle = palette.text;
-  ctx.shadowColor = "rgba(66, 245, 141, 0.38)";
+  ctx.shadowColor = palette.glow;
   ctx.shadowBlur = 14;
   ctx.fillText(`${hours}:${minutes}`, WIDTH / 2, 116);
 
@@ -287,23 +427,31 @@ function drawMain(elapsed, revealProgress = 1) {
   ctx.lineTo(302, 244);
   ctx.stroke();
 
-  drawTerminalLine("steps", "8234", 270, reveal);
-  drawTerminalLine("heart", "72 bpm", 304, reveal);
-  drawTerminalLine("weather", "26C", 338, reveal);
-  drawTerminalLine("batt", "86%", 372, reveal);
+  if (rootMode) {
+    drawTerminalLine("uid", "0(root)", 270, reveal);
+    drawTerminalLine("shell", "/bin/su", 304, reveal);
+    drawTerminalLine("secure", "off", 338, reveal);
+    drawTerminalLine("batt", "86%", 372, reveal);
+  } else {
+    drawTerminalLine("steps", "8234", 270, reveal);
+    drawTerminalLine("heart", "72 bpm", 304, reveal);
+    drawTerminalLine("weather", "26C", 338, reveal);
+    drawTerminalLine("batt", "86%", 372, reveal);
+  }
   drawBattery(34, 420, 0.86, reveal);
 
   ctx.font = "12px Consolas, Cascadia Mono, monospace";
   ctx.fillStyle = palette.muted;
   ctx.textAlign = "right";
-  ctx.fillText("/usr/time/live", 302, 421);
+  ctx.fillText(rootMode ? "/root/time/live" : "/usr/time/live", 302, 421);
 
-  const blink = Math.sin(elapsed / 420) > 0 ? 1 : 0.25;
-  ctx.globalAlpha = reveal * blink;
-  ctx.fillStyle = palette.green;
-  ctx.shadowColor = palette.green;
-  ctx.shadowBlur = 6;
-  ctx.fillRect(34, 448, 9, 2);
+  drawTerminalPrompt(elapsed, reveal);
+
+  if (modePulse > 0) {
+    ctx.globalAlpha = reveal * modePulse * 0.16;
+    ctx.fillStyle = palette.green;
+    ctx.fillRect(0, 0, WIDTH, HEIGHT);
+  }
   ctx.restore();
 }
 
@@ -328,6 +476,9 @@ function restart() {
   cancelAnimationFrame(animationFrame);
   startedAt = performance.now();
   paused = false;
+  activeCommand = null;
+  tapTimes = [];
+  setRootMode(false, 0);
   toggleButton.textContent = "Pause";
   animationFrame = requestAnimationFrame(loop);
 }
@@ -357,13 +508,23 @@ function downloadCurrentFrame() {
 restartButton.addEventListener("click", restart);
 toggleButton.addEventListener("click", togglePause);
 downloadButton.addEventListener("click", downloadCurrentFrame);
+canvas.addEventListener("pointerup", handleTripleTap);
+canvas.addEventListener("click", handleTripleTap);
+watchShell.addEventListener("pointerup", handleTripleTap);
+watchShell.addEventListener("click", handleTripleTap);
 
 window.BootfacePreview = {
   drawFrame,
   width: WIDTH,
   height: HEIGHT,
   bootDuration: BOOT_DURATION,
-  revealDuration: REVEAL_DURATION
+  revealDuration: REVEAL_DURATION,
+  debugState: () => ({
+    rootMode,
+    activeCommand,
+    tapTimes: [...tapTimes],
+    elapsed: currentElapsed()
+  })
 };
 
 restart();

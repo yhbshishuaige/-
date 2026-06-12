@@ -3,19 +3,20 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>BOOTFACE Preview</title>
-  <link rel="stylesheet" href="./style.css">
+  <meta name="description" content="BOOTFACE: a terminal-style Xiaomi Smart Band 8 Pro watch face demo.">
+  <title>BOOTFACE Demo</title>
+  <link rel="stylesheet" href="./preview/style.css">
 </head>
 <body>
   <main class="workspace">
-    <section class="watch-shell" aria-label="Xiaomi Smart Band 8 Pro preview">
+    <section class="watch-shell" aria-label="Xiaomi Smart Band 8 Pro demo">
       <canvas id="watchface" width="336" height="480"></canvas>
     </section>
 
-    <section class="panel" aria-label="Preview controls">
+    <section class="panel" aria-label="Demo controls">
       <p class="eyebrow">Xiaomi Smart Band 8 Pro · 336 x 480</p>
       <h1>BOOTFACE</h1>
-      <p class="summary">A minimal terminal-style watch face with a pixel boot animation.</p>
+      <p class="summary">A minimal terminal-style watch face with a pixel boot animation and hidden root mode.</p>
 
       <div class="controls">
         <button id="restart" type="button">Restart</button>
@@ -33,13 +34,13 @@
           <dd>AMOLED black + terminal green / root red</dd>
         </div>
         <div>
-          <dt>Animation</dt>
-          <dd>Centered pixel assembly, then watch face reveal</dd>
+          <dt>Root mode</dt>
+          <dd>Triple tap the watch face</dd>
         </div>
       </dl>
     </section>
   </main>
 
-  <script src="./watchface.js"></script>
+  <script src="./preview/watchface.js"></script>
 </body>
 </html>
